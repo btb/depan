@@ -51,8 +51,11 @@
 
 */
 
-#include "windows.h"
-#include "avisynth.h"
+#include <algorithm>
+#include <dlfcn.h>
+
+#include <windowsPorts/windows2linux.h>
+#include <avxplugin.h>
 #include "math.h"
 #include "stdio.h"
 
@@ -60,6 +63,8 @@
 #include "depanio.h"
 #include "info.h"
 #include "estimate_fftw.h"
+
+#define OutputDebugString(x) fprintf(stderr, "%s", x)
 
 
 // constructor
@@ -123,16 +128,16 @@ DePanEstimate_fftw::DePanEstimate_fftw(PClip _child, int _range, float _trust, i
 	if (dymax >= winy/2) env->ThrowError("DePanEstimate: DYMAX must be less WINY/2 !");
 
 
-	hinstLib = LoadLibrary("fftw3.dll"); // added in v 1.2 for delayed loading
+	hinstLib = dlopen("libfftw3f.dylib", RTLD_LAZY); // added in v 1.2 for delayed loading
 	if (hinstLib != NULL)
 	{
-		fftwf_free_addr = (fftwf_free_proc) GetProcAddress(hinstLib, "fftwf_free");
-		fftwf_malloc_addr = (fftwf_malloc_proc)GetProcAddress(hinstLib, "fftwf_malloc");
-		fftwf_plan_dft_r2c_2d_addr = (fftwf_plan_dft_r2c_2d_proc) GetProcAddress(hinstLib, "fftwf_plan_dft_r2c_2d");
-		fftwf_plan_dft_c2r_2d_addr = (fftwf_plan_dft_c2r_2d_proc) GetProcAddress(hinstLib, "fftwf_plan_dft_c2r_2d");
-		fftwf_destroy_plan_addr = (fftwf_destroy_plan_proc) GetProcAddress(hinstLib, "fftwf_destroy_plan");
-		fftwf_execute_dft_r2c_addr = (fftwf_execute_dft_r2c_proc) GetProcAddress(hinstLib, "fftwf_execute_dft_r2c");
-		fftwf_execute_dft_c2r_addr = (fftwf_execute_dft_c2r_proc) GetProcAddress(hinstLib, "fftwf_execute_dft_c2r");
+		fftwf_free_addr = (fftwf_free_proc) dlsym(hinstLib, "fftwf_free");
+		fftwf_malloc_addr = (fftwf_malloc_proc)dlsym(hinstLib, "fftwf_malloc");
+		fftwf_plan_dft_r2c_2d_addr = (fftwf_plan_dft_r2c_2d_proc) dlsym(hinstLib, "fftwf_plan_dft_r2c_2d");
+		fftwf_plan_dft_c2r_2d_addr = (fftwf_plan_dft_c2r_2d_proc) dlsym(hinstLib, "fftwf_plan_dft_c2r_2d");
+		fftwf_destroy_plan_addr = (fftwf_destroy_plan_proc) dlsym(hinstLib, "fftwf_destroy_plan");
+		fftwf_execute_dft_r2c_addr = (fftwf_execute_dft_r2c_proc) dlsym(hinstLib, "fftwf_execute_dft_r2c");
+		fftwf_execute_dft_c2r_addr = (fftwf_execute_dft_c2r_proc) dlsym(hinstLib, "fftwf_execute_dft_c2r");
 	}
 	if (hinstLib==NULL || fftwf_free_addr==NULL || fftwf_malloc_addr==NULL || fftwf_plan_dft_r2c_2d_addr==NULL ||
 		fftwf_plan_dft_c2r_2d_addr==NULL || fftwf_destroy_plan_addr==NULL || fftwf_execute_dft_r2c_addr==NULL || fftwf_execute_dft_c2r_addr==NULL)
@@ -278,7 +283,7 @@ DePanEstimate_fftw::~DePanEstimate_fftw() {
 	free(trust);
 
 	if (hinstLib != NULL)
-		FreeLibrary(hinstLib);
+		dlclose(hinstLib);
 }
 
 
@@ -322,10 +327,11 @@ void DePanEstimate_fftw::frame_data2d (const BYTE * srcp0, int height, int src_w
 
 
 
+#if 1
 //****************************************************************************
 //
 //
-void mult_conj_data2d_nosse (fftwf_complex *fftnext, fftwf_complex *fftsrc, fftwf_complex *mult, int winx, int winy)
+void DePanEstimate_fftw::mult_conj_data2d (fftwf_complex *fftnext, fftwf_complex *fftsrc, fftwf_complex *mult, int winx, int winy)
 {
 	// multiply complex conj. *next to src
 	// (hermit)
@@ -344,6 +350,7 @@ void mult_conj_data2d_nosse (fftwf_complex *fftnext, fftwf_complex *fftsrc, fftw
 	}
 }
 
+#else
 //****************************************************************************
 //
 //
@@ -402,6 +409,7 @@ nextpair:
 	//}
 	}
 }
+#endif
 
 
 //****************************************************************************
@@ -962,13 +970,13 @@ PVideoFrame __stdcall DePanEstimate_fftw::GetFrame(int ndest, IScriptEnvironment
 							motionx[ncur] = (dx1 + dx2)/2;
 							motiony[ncur] = (dy1 + dy2)/2;
 							motionzoom[ncur] = zoom ;
-							trust[ncur] = min(trust1, trust2);
+							trust[ncur] = std::min(trust1, trust2);
 					}
 					else { // bad zoom,
 							motionx[ncur] = 0;
 							motiony[ncur] = 0;
 							motionzoom[ncur] = 1;
-							trust[ncur] = min(trust1, trust2);
+							trust[ncur] = std::min(trust1, trust2);
 					}
 
 //					if (improve != 0) / did not never really work, disabled in v1.6

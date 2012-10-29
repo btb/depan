@@ -50,11 +50,13 @@
 #ifndef __ESTIMATE_FFTW_H__
 #define __ESTIMATE_FFTW_H__
 
-#include "windows.h"
-#include "avisynth.h"
+#include <windowsPorts/windows2linux.h>
+#include <avxplugin.h>
 #include "stdio.h"
 //#include "fftw\fftw3.h"
 #include "fftwlite.h" // v.1.2
+
+using namespace avxsynth;
 
 //****************************************************************************
 class DePanEstimate_fftw : public GenericVideoFilter {

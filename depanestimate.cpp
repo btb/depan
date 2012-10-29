@@ -55,8 +55,8 @@
 
 */
 
-#include "windows.h"
-#include "avisynth.h"
+#include <windowsPorts/windows2linux.h>
+#include <avxplugin.h>
 #include "estimate_fftw.h"
 
 

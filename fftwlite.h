@@ -6,7 +6,7 @@
 typedef float fftwf_complex[2];
 typedef struct fftwf_plan_s  *fftwf_plan;
 typedef fftwf_complex* (*fftwf_malloc_proc)(size_t n); 
-typedef VOID (*fftwf_free_proc) (void *ppp);
+typedef void (*fftwf_free_proc) (void *ppp);
 typedef fftwf_plan (*fftwf_plan_dft_r2c_2d_proc) (int winy, int winx, float *realcorrel, fftwf_complex *correl, int flags);
 typedef fftwf_plan (*fftwf_plan_dft_c2r_2d_proc) (int winy, int winx, fftwf_complex *correl, float *realcorrel, int flags);
 typedef void (*fftwf_destroy_plan_proc) (fftwf_plan);
