@@ -56,8 +56,10 @@
 
 */
 
-#include "windows.h"
-#include "avisynth.h"
+#include <algorithm>
+
+#include <windowsPorts/windows2linux.h>
+#include <avxplugin.h>
 #include "math.h"
 #include "float.h"
 //#include "stdio.h"
@@ -215,8 +217,8 @@ DePanStabilize::DePanStabilize(PClip _child, PClip _DePanData, float _cutoff,
 
 //	matchfields =1;
 
-//	zoommax = max(zoommax, initzoom); // v1.7 to prevent user error
-	zoommax = zoommax > 0 ? max(zoommax, initzoom) : -max(-zoommax, initzoom) ; // v1.8.2
+//	zoommax = std::max(zoommax, initzoom); // v1.7 to prevent user error
+	zoommax = zoommax > 0 ? std::max(zoommax, initzoom) : -std::max(-zoommax, initzoom) ; // v1.8.2
 
 	int fieldbased = (vi.IsFieldBased()) ? 1 : 0;
 	TFF = (vi.IsTFF() ) ? 1 : 0;
@@ -360,9 +362,9 @@ DePanStabilize::DePanStabilize(PClip _child, PClip _DePanData, float _cutoff,
 
 	winrz = (float *)malloc((wintsize+1)*sizeof(float));
 	winfz = (float *)malloc((wintsize+1)*sizeof(float));
-	winrzsize = min(wintsize,int(fps*tzoom/4));
-//	winfzsize = min(wintsize,int(fps*tzoom*1.5/4));
-	winfzsize = min(wintsize,int(fps*tzoom/4));
+	winrzsize = std::min(wintsize,int(fps*tzoom/4));
+//	winfzsize = std::min(wintsize,int(fps*tzoom*1.5/4));
+	winfzsize = std::min(wintsize,int(fps*tzoom/4));
 	for (int i=0; i<winrzsize; i++)
 		winrz[i] = cosf(i*0.5f*PI/winrzsize);
 	for (int i=winrzsize; i<=wintsize; i++)
@@ -598,11 +600,11 @@ void DePanStabilize::Average(int nbase, int ndest, int nmax, transform * ptrdif)
 			trsmoothed[ndest].dyx = -trsmoothed[ndest].dxy*(pixaspect/nfields)*(pixaspect/nfields); // must be consistent
 			norm = 0;
 			trsmoothed[ndest].dxx = 0;
-			for (n=max(nbase, ndest-1); n<ndest; n++) { // very short interval
+			for (n=std::max(nbase, ndest-1); n<ndest; n++) { // very short interval
 				trsmoothed[ndest].dxx += trcumul[n].dxx*wint[ndest-n];
 				norm += wint[ndest-n];
 			}
-			for (n=ndest; n<=min(nmax,ndest+1); n++) {
+			for (n=ndest; n<=std::min(nmax,ndest+1); n++) {
 				trsmoothed[ndest].dxx += trcumul[n].dxx*wint[n-ndest];
 				norm += wint[n-ndest];
 			}
@@ -614,11 +616,11 @@ void DePanStabilize::Average(int nbase, int ndest, int nmax, transform * ptrdif)
 
 			if (addzoom) { // calculate and add adaptive zoom factor to fill borders (for all frames from base to ndest)
 
-				int nbasez = max(nbase, ndest-winfzsize);
-				int nmaxz = min(nmax, ndest+winrzsize);
+				int nbasez = std::max(nbase, ndest-winfzsize);
+				int nmaxz = std::min(nmax, ndest+winrzsize);
             	// symmetrical
- //               nmaxz = ndest + min(nmaxz-ndest, ndest-nbasez);
- //               nbasez = ndest - min(nmaxz-ndest, ndest-nbasez);
+ //               nmaxz = ndest + std::min(nmaxz-ndest, ndest-nbasez);
+ //               nbasez = ndest - std::min(nmaxz-ndest, ndest-nbasez);
 
 				azoom[nbasez] = initzoom;
 				for (n=nbasez+1; n<=nmaxz; n++) {
@@ -692,7 +694,7 @@ void DePanStabilize::Average(int nbase, int ndest, int nmax, transform * ptrdif)
 void DePanStabilize::InertialLimit(float *dxdif, float *dydif, float *zoomdif, float *rotdif, int ndest, int *nbase)
 {
 		// limit max motion corrections
-		if ( !(_finite(*dxdif)) ) // check added in v.1.1.3
+		if ( !(isfinite(*dxdif)) ) // check added in v.1.1.3
 		{// infinite or NAN
 				*dxdif = 0;
 				*dydif = 0;
@@ -716,7 +718,7 @@ void DePanStabilize::InertialLimit(float *dxdif, float *dydif, float *zoomdif, f
 			}
 		}
 
-		if ( !(_finite(*dydif)) )
+		if ( !(isfinite(*dydif)) )
 		{// infinite or NAN
 				*dxdif = 0;
 				*dydif = 0;
@@ -740,7 +742,7 @@ void DePanStabilize::InertialLimit(float *dxdif, float *dydif, float *zoomdif, f
 			}
 		}
 
-		if ( !(_finite(*zoomdif)) )
+		if ( !(isfinite(*zoomdif)) )
 		{// infinite or NAN
 				*dxdif = 0;
 				*dydif = 0;
@@ -764,7 +766,7 @@ void DePanStabilize::InertialLimit(float *dxdif, float *dydif, float *zoomdif, f
 			}
 		}
 
-		if ( !(_finite(*rotdif)) )
+		if ( !(isfinite(*rotdif)) )
 		{// infinite or NAN
 				*dxdif = 0;
 				*dydif = 0;
@@ -796,9 +798,9 @@ float DePanStabilize::Averagefraction(float dxdif, float dydif, float zoomdif, f
 	float fractionz = fabsf(zoomdif-1) / fabsf((fabsf(zoommax)-1));
 	float fractionr = fabsf(rotdif) / fabsf(rotmax);
 
-	float fraction = max(fractionx, fractiony);
-	fraction = max(fraction, fractionz);
-	fraction = max(fraction, fractionr);
+	float fraction = std::max(fractionx, fractiony);
+	fraction = std::max(fraction, fractionz);
+	fraction = std::max(fraction, fractionr);
 	return fraction;
 
 }
@@ -858,7 +860,7 @@ PVideoFrame __stdcall DePanStabilize::GetFrame(int ndest, IScriptEnvironment* en
 	if (method == 0) // inertial
 		nmax = ndest;
 	else
-		nmax = min(ndest + radius, vi.num_frames-1); // max n to take into account
+		nmax = std::min(ndest + radius, vi.num_frames-1); // max n to take into account
 
 	// get motion info about frames in interval from begin source to dest in reverse order
 	for (n = nbase; n <= ndest; n++) {
@@ -916,13 +918,13 @@ PVideoFrame __stdcall DePanStabilize::GetFrame(int ndest, IScriptEnvironment* en
 //		OutputDebugString(debugbuf);
 	// limit frame search range
 	if (n < nmax) {
-		nmax = max(n-1, ndest);  // set max frame to new scene start-1 if found
+		nmax = std::max(n-1, ndest);  // set max frame to new scene start-1 if found
 	}
 
 	if (method != 0)
 	{	// symmetrical
-		nmax = ndest + min(nmax-ndest, ndest-nbase);
-		nbase = ndest - min(nmax-ndest, ndest-nbase);
+		nmax = ndest + std::min(nmax-ndest, ndest-nbase);
+		nbase = ndest - std::min(nmax-ndest, ndest-nbase);
 	}
 
 //		sprintf(debugbuf,"DePanStabilize: nbase=%d ndest=%d nmax=%d\n", nbase, ndest, nmax);
@@ -981,8 +983,8 @@ PVideoFrame __stdcall DePanStabilize::GetFrame(int ndest, IScriptEnvironment* en
 			{
 				// decrease radius
 				radius1 = radius1*0.9;
-				nbase = max(nbase, ndest - radius1);
-				nmax = min(nmax, ndest + radius1);
+				nbase = std::max(nbase, ndest - radius1);
+				nmax = std::min(nmax, ndest + radius1);
 				// update wint and may be winz
 					float PI = 3.14159265258;
 					for (int i=0; i<radius1; i++)
@@ -995,7 +997,7 @@ PVideoFrame __stdcall DePanStabilize::GetFrame(int ndest, IScriptEnvironment* en
 				if (radius1 != radius) // was decreased
 					break;
 				// increase radius
-				radius1 = min(radius + 1, wintsize);
+				radius1 = std::min(radius + 1, wintsize);
 				if (radius1 != radius)
 				{
 					// update wint and may be winz

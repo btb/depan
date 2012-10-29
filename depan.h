@@ -24,7 +24,9 @@
 #ifndef __DEPAN_H__
 #define __DEPAN_H__
 
-#include "windows.h"
+#include <windowsPorts/windows2linux.h>
+using namespace avxsynth;
+
 //#include "stdio.h"
 
 //#define MAX(x,y) ((x) > (y) ? (x) : (y))

@@ -20,8 +20,10 @@
 
 */
 
-#include "windows.h"
-//#include "avisynth.h"
+#include <algorithm>
+
+#include <windowsPorts/windows2linux.h>
+//#include <avxplugin.h>
 #include "math.h"
 #include "float.h"
 
@@ -66,7 +68,7 @@ void compensate_plane_nearest (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 	int mleft = mirror & MIRROR_LEFT;
 	int mright = mirror & MIRROR_RIGHT;
 
-	_controlfp(_MCW_RC, _RC_CHOP); // set rounding mode to truncate to zero mode (C++ standard) for /QIfist compiler option (which is for faster float-int conversion)
+	//_controlfp(_MCW_RC, _RC_CHOP); // set rounding mode to truncate to zero mode (C++ standard) for /QIfist compiler option (which is for faster float-int conversion)
 
 //	select if rotation, zoom?
 
@@ -102,7 +104,7 @@ void compensate_plane_nearest (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 					}
 					else if ( rowleft < 0 && mleft) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, -rowleft);
+							blurlen = std::min(blurmax, -rowleft);
 							smoothed = 0;
 							for (i=-rowleft-blurlen+1; i<= -rowleft; i++)
 								smoothed += srcp[w0 + i];
@@ -114,7 +116,7 @@ void compensate_plane_nearest (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 					}
 					else if ( rowleft >= row_size && mright) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, rowleft-row_size+1);
+							blurlen = std::min(blurmax, rowleft-row_size+1);
 							smoothed = 0;
 							for (i=row_size + row_size - rowleft -2; i<row_size + row_size - rowleft -2+blurlen ; i++)
 								smoothed += srcp[w0 + i];
@@ -175,7 +177,7 @@ void compensate_plane_nearest (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 					}
 					else if ( rowleft < 0 && mleft) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, -rowleft);
+							blurlen = std::min(blurmax, -rowleft);
 							smoothed = 0;
 							for (i=-rowleft-blurlen+1; i<= -rowleft; i++)
 								smoothed += srcp[w0 + i];
@@ -187,7 +189,7 @@ void compensate_plane_nearest (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 					}
 					else if ( rowleft >= row_size && mright) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, rowleft-row_size+1);
+							blurlen = std::min(blurmax, rowleft-row_size+1);
 							smoothed = 0;
 							for (i=row_size + row_size - rowleft -2; i<row_size + row_size - rowleft -2+blurlen ; i++)
 								smoothed += srcp[w0 + i];
@@ -259,7 +261,7 @@ void compensate_plane_nearest (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 		} //end for h
 	} // end if rotation
 
-	_controlfp(_MCW_RC, _RC_NEAR); // restore rounding mode to default (nearest) mode for /QIfist compiler option
+	//_controlfp(_MCW_RC, _RC_NEAR); // restore rounding mode to default (nearest) mode for /QIfist compiler option
 
 }
 
@@ -304,7 +306,7 @@ void compensate_plane_bilinear (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  
 
 	int rowgoodstart, rowgoodend, rowbadstart, rowbadend;
 
-	_controlfp(_MCW_RC, _RC_CHOP); // set rounding mode to truncate to zero mode (C++ standard) for /QIfist compiler option (which is for faster float-int conversion)
+	//_controlfp(_MCW_RC, _RC_CHOP); // set rounding mode to truncate to zero mode (C++ standard) for /QIfist compiler option (which is for faster float-int conversion)
 
 	// prepare interpolation coefficients tables
 	// for position of xsrc in integer grid
@@ -394,7 +396,7 @@ void compensate_plane_bilinear (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  
 
 					if ( rowleft < 0 && mleft) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, -rowleft);
+							blurlen = std::min(blurmax, -rowleft);
 							smoothed = 0;
 							for (i=-rowleft-blurlen+1; i<= -rowleft; i++)
 								smoothed += srcp[w0 + i];
@@ -406,7 +408,7 @@ void compensate_plane_bilinear (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  
 					}
 					else if ( rowleft >= row_size-1 && mright) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, rowleft-row_size+2); // v.1.10.1
+							blurlen = std::min(blurmax, rowleft-row_size+2); // v.1.10.1
 							smoothed = 0;
 							for (i=row_size+row_size-rowleft-2; i< row_size+row_size-rowleft-2+blurlen; i++)
 								smoothed += srcp[w0 + i];
@@ -504,7 +506,7 @@ void compensate_plane_bilinear (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  
 						pixel = ( intcoef2dzoom[ix2]*srcp[w] + intcoef2dzoom[ix2+1]*srcp[w+1]  + \
 								intcoef2dzoom[ix2+66]*srcp[w+src_pitch] + intcoef2dzoom[ix2+67]*srcp[w+src_pitch+1] )>>10; // v1.6
 
-//						dstp[row] = max(min(pixel,255),0);
+//						dstp[row] = std::max(std::min(pixel,255),0);
 						dstp[row] = pixel;   // maxmin disabled in v1.6
 					}
 					else if ( rowleft < 0 && mleft) {
@@ -512,7 +514,7 @@ void compensate_plane_bilinear (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  
 					}
 					else if ( rowleft >= row_size-1 && mright) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, rowleft-row_size+2); // v1.10.1
+							blurlen = std::min(blurmax, rowleft-row_size+2); // v1.10.1
 							smoothed = 0;
 							for (i=row_size + row_size - rowleft -2; i<row_size + row_size - rowleft -2+blurlen ; i++)
 								smoothed += srcp[w0 + i];
@@ -584,7 +586,7 @@ void compensate_plane_bilinear (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  
 					pixel = ( (intcoef[ix2]*srcp[w0] + intcoef[ix2+1]*srcp[w0+1] )*intcoef[iy2] + \
 							(intcoef[ix2]*srcp[w0+src_pitch] + intcoef[ix2+1]*srcp[w0+src_pitch+1] )*intcoef[iy2+1] )>>10;
 
-//					dstp[row] = max(min(pixel,255),0);
+//					dstp[row] = std::max(std::min(pixel,255),0);
 					dstp[row] = pixel;       //maxmin disabled in v1.6
 				}
 				else {
@@ -608,7 +610,7 @@ void compensate_plane_bilinear (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  
 		} //end for h
 	} // end if rotation
 
-	_controlfp(_MCW_RC, _RC_NEAR); // restore rounding mode to default (nearest) mode for /QIfist compiler option
+	//_controlfp(_MCW_RC, _RC_NEAR); // restore rounding mode to default (nearest) mode for /QIfist compiler option
 
 }
 
@@ -649,7 +651,7 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 	int mleft = mirror & MIRROR_LEFT;
 	int mright = mirror & MIRROR_RIGHT;
 
-	_controlfp(_MCW_RC, _RC_CHOP); // set rounding mode to truncate to zero mode (C++ standard) for /QIfist compiler option (which is for faster float-int conversion)
+	//_controlfp(_MCW_RC, _RC_CHOP); // set rounding mode to truncate to zero mode (C++ standard) for /QIfist compiler option (which is for faster float-int conversion)
 
 	// prepare interpolation coefficients tables
 	// for position of xsrc in integer grid
@@ -723,12 +725,12 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 								intcoef2d[8]*srcp[w+src_pitch-1] + intcoef2d[9]*srcp[w+src_pitch] +	 intcoef2d[10]*srcp[w+src_pitch+1] + intcoef2d[11]*srcp[w+src_pitch+2] + \
 								intcoef2d[12]*srcp[w+src_pitch*2-1] + intcoef2d[13]*srcp[w+src_pitch*2] + intcoef2d[14]*srcp[w+src_pitch*2+1] + intcoef2d[15]*srcp[w+src_pitch*2+2] ) >>11;  // i.e. /2048
 
-						dstp[row] = max(min(pixel,255),0);
+						dstp[row] = std::max(std::min(pixel,255),0);
 
 					}
 					else if ( rowleft < 0 && mleft) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, -rowleft);
+							blurlen = std::min(blurmax, -rowleft);
 							smoothed = 0;
 							for (i=-rowleft-blurlen+1; i<= -rowleft; i++)
 								smoothed += srcp[w0 + i];
@@ -740,7 +742,7 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 					}
 					else if ( rowleft >= row_size && mright) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, rowleft-row_size+1);
+							blurlen = std::min(blurmax, rowleft-row_size+1);
 							smoothed = 0;
 							for (i=row_size + row_size - rowleft -2; i<row_size + row_size - rowleft -2+blurlen ; i++)
 								smoothed += srcp[w0 + i];
@@ -864,11 +866,11 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 
 						pixel =  (intcoef[iy4]*ts[0] + intcoef[iy4+1]*ts[1] +  intcoef[iy4+2]*ts[2] + intcoef[iy4+3]*ts[3] )>>22;
 
-						dstp[row] = max(min(pixel,255),0);
+						dstp[row] = std::max(std::min(pixel,255),0);
 					}
 					else if ( rowleft < 0 && mleft) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, -rowleft);
+							blurlen = std::min(blurmax, -rowleft);
 							smoothed = 0;
 							for (i=-rowleft-blurlen+1; i<= -rowleft; i++)
 								smoothed += srcp[w0 + i];
@@ -880,7 +882,7 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 					}
 					else if ( rowleft >= row_size && mright) {
 						if (blurmax>0) {
-							blurlen = min(blurmax, rowleft-row_size+1);
+							blurlen = std::min(blurmax, rowleft-row_size+1);
 							smoothed = 0;
 							for (i=row_size + row_size - rowleft -2; i<row_size + row_size - rowleft -2+blurlen ; i++)
 								smoothed += srcp[w0 + i];
@@ -907,7 +909,7 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 						w = w0 + rowleft;
 						pixel = (int)( (1.0-sy)*( (1.0-sx)*srcp[w] + sx*srcp[w+1] ) + \
 							sy*((1.0-sx)*srcp[w+src_pitch] + sx*srcp[w+src_pitch+1] ) ); // bilinear
-						dstp[row] = max(min(pixel,255),0);
+						dstp[row] = std::max(std::min(pixel,255),0);
 					}
 					else if ( rowleft == row_size-1) { // added in v.1.1.1
 						dstp[row]= srcp[rowleft + w0];
@@ -1006,7 +1008,7 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 						iy4 = ((int)((ysrc-hlow)*256))<<2; //changed to shift in v.1.1.1
 
 						pixel =  (intcoef[iy4]*ts[0] + intcoef[iy4+1]*ts[1] +  intcoef[iy4+2]*ts[2] + intcoef[iy4+3]*ts[3] )>>22;
-						dstp[row] = max(min(pixel,255),0);
+						dstp[row] = std::max(std::min(pixel,255),0);
 				}
 				else {
 					if (hlow < 0 && mtop) hlow = - hlow;  // mirror borders
@@ -1027,7 +1029,7 @@ void compensate_plane_bicubic (BYTE *dstp,  int dst_pitch, const BYTE * srcp,  i
 		} //end for h
 	} // end if rotation
 
-	_controlfp(_MCW_RC, _RC_NEAR); // restore rounding mode to default (nearest) mode for /QIfist compiler option
+	//_controlfp(_MCW_RC, _RC_NEAR); // restore rounding mode to default (nearest) mode for /QIfist compiler option
 
 }
 

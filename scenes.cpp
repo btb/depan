@@ -31,8 +31,8 @@
 
 */
 
-#include "windows.h"
-#include "avisynth.h"
+#include <windowsPorts/windows2linux.h>
+#include <avxplugin.h>
 #include "stdio.h"
 
 #include "depanio.h"

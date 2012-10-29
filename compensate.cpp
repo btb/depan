@@ -57,8 +57,8 @@
 
 */
 
-#include "windows.h"
-#include "avisynth.h"
+#include <windowsPorts/windows2linux.h>
+#include <avxplugin.h>
 #include "math.h"
 #include "stdio.h"
 

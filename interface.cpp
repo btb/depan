@@ -33,8 +33,10 @@
   v1.9 - Remove DePanEstimate function to separate plugin depanestimate.dll
 */
 
-#include "windows.h"
-#include "avisynth.h"
+#include <windowsPorts/windows2linux.h>
+#include <avxplugin.h>
+
+using namespace avxsynth;
 
 //****************************************************************************
 // This is the declaration of plugin functions

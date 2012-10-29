@@ -24,8 +24,10 @@
 #ifndef __DEPANIO_H__
 #define __DEPANIO_H__
 
-#include "windows.h"
+#include <windowsPorts/windows2linux.h>
 #include "stdio.h"
+
+using namespace avxsynth;
 
 //#define MAX(x,y) ((x) > (y) ? (x) : (y))
 //#define MIN(x,y) ((x) < (y) ? (x) : (y))
