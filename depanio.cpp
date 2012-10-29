@@ -149,7 +149,7 @@ int read_deshakerlog(const char *inputlog, int num_frames, float motionx[], floa
 	char line[48];
 	int field;
     float dx=0, dy=0, rot=0, zoom=1;
-	int i,n;
+	long int i,n;
 
 // Open DESHAKER.LOG  file
 		logfile = fopen(inputlog,"rt");

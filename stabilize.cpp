@@ -249,7 +249,7 @@ DePanStabilize::DePanStabilize(PClip _child, PClip _DePanData, float _cutoff,
 //	child->SetCacheHints(CACHE_RANGE,3);
 //	DePanData->SetCacheHints(CACHE_RANGE,3);
 
-	if (inputlog != "") { // motion data will be readed from deshaker.log file once at start
+	if (inputlog[0] != '\0') { // motion data will be readed from deshaker.log file once at start
 		error = read_deshakerlog(inputlog,vi.num_frames,motionx,motiony,motionrot,motionzoom,&loginterlaced);
 		if (error==-1)	env->ThrowError("DePan: Input log file not found!");
 		if (error==-2)	env->ThrowError("DePan: Error input log file format!");
@@ -1045,22 +1045,22 @@ PVideoFrame __stdcall DePanStabilize::GetFrame(int ndest, IScriptEnvironment* en
 //--------------------------------------------------------------------------
 //--------------------------------------------------------------------------
 	//output motion to AviSynth (float) variables - added in v.1.8 as requested by AI
-	if (vdx != "")
+	if (vdx[0] != '\0')
 	{
 		vdx_val = dxdif; // store to static place
 		env->SetVar(vdx, vdx_val); // by reference!
 	}
-	if (vdy != "")
+	if (vdy[0] != '\0')
 	{
 		vdy_val = dydif;
 		env->SetVar(vdy, vdy_val);
 	}
-	if (vzoom != "")
+	if (vzoom[0] != '\0')
 	{
 		vzoom_val = zoomdif;
 	}
 		env->SetVar(vzoom, vzoom_val);
-	if (vrot != "")
+	if (vrot[0] != '\0')
 	{
 		vrot_val = rotdif;
 		env->SetVar(vrot, vrot_val);

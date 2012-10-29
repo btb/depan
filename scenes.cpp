@@ -125,7 +125,7 @@ DePanScenes::DePanScenes(PClip _child, int _plane, const char * _inputlog, IScri
 
 //	child->SetCacheHints(CACHE_RANGE,0); - disabled in v.1.9
 
-	if (inputlog != "") { // motion data will be readed from deshaker.log file once at start
+	if (inputlog[0] != '\0') { // motion data will be readed from deshaker.log file once at start
 		error = read_deshakerlog(inputlog,vi.num_frames,motionx,motiony,motionrot,motionzoom,&loginterlaced);
 		if (error==-1)	env->ThrowError("DePanScenes: Input log file not found!");
 		if (error==-2)	env->ThrowError("DePanScenes: Error input log file format!");
@@ -303,7 +303,7 @@ PVideoFrame __stdcall DePanScenes::GetFrame(int ndest, IScriptEnvironment* env) 
 				dstp[w+3] = srcp[w+3]; 
 			}
 		}
-		else if (plane = 2) // U
+		else if (plane == 2) // U
 		{ // copy
 			for (w=0; w<src_width; w+=4)
 			{
@@ -313,7 +313,7 @@ PVideoFrame __stdcall DePanScenes::GetFrame(int ndest, IScriptEnvironment* env) 
 				dstp[w+3] = srcp[w+3]; 
 			}
 		}
-		else if (plane = 3) // Y,U
+		else if (plane == 3) // Y,U
 		{ // copy
 			for (w=0; w<src_width; w+=4)
 			{
@@ -323,7 +323,7 @@ PVideoFrame __stdcall DePanScenes::GetFrame(int ndest, IScriptEnvironment* env) 
 				dstp[w+3] = srcp[w+3]; 
 			}
 		}
-		else if (plane = 4) // V
+		else if (plane == 4) // V
 		{ // copy
 			for (w=0; w<src_width; w+=4)
 			{
@@ -333,7 +333,7 @@ PVideoFrame __stdcall DePanScenes::GetFrame(int ndest, IScriptEnvironment* env) 
 				dstp[w+3] = mark; 
 			}
 		}
-		else if (plane = 5) // Y,V
+		else if (plane == 5) // Y,V
 		{ // copy
 			for (w=0; w<src_width; w+=4)
 			{
@@ -343,7 +343,7 @@ PVideoFrame __stdcall DePanScenes::GetFrame(int ndest, IScriptEnvironment* env) 
 				dstp[w+3] = mark; 
 			}
 		}
-		else if (plane = 6) // U,V
+		else if (plane == 6) // U,V
 		{ // copy
 			for (w=0; w<src_width; w+=4)
 			{
@@ -353,7 +353,7 @@ PVideoFrame __stdcall DePanScenes::GetFrame(int ndest, IScriptEnvironment* env) 
 				dstp[w+3] = mark; 
 			}
 		}
-		else if (plane = 7) // Y,U,V
+		else if (plane == 7) // Y,U,V
 		{ // copy
 			for (w=0; w<src_width; w+=4)
 			{
