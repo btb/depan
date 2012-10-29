@@ -221,12 +221,12 @@ DePanEstimate_fftw::DePanEstimate_fftw(PClip _child, int _range, float _trust, i
 	child->SetCacheHints(CACHE_RANGE,2*range+1); // v1.7
 
 //	logfilename = "DePan.log";
-	if (logfilename != "") {
+	if (logfilename[0] != '\0') {
 		logfile = fopen(logfilename,"wt");
 		if (logfile == NULL)	env->ThrowError("DePanEstimate: Log file can not be created!");
 	}
 
-	if (extlogfilename != "") {
+	if (extlogfilename[0] != '\0') {
 		extlogfile = fopen(extlogfilename,"wt");
 		if (extlogfile == NULL)	env->ThrowError("DePanEstimate: ExtLog file can not be created!");
 	}
@@ -245,11 +245,11 @@ DePanEstimate_fftw::DePanEstimate_fftw(PClip _child, int _range, float _trust, i
 DePanEstimate_fftw::~DePanEstimate_fftw() {
   // This is where you can deallocate any memory you might have used.
 
-	if (logfilename != "" && logfile != NULL) {
+	if (logfilename[0] != '\0' && logfile != NULL) {
 		fclose(logfile);
 	}
 
-	if (extlogfilename != "" && extlogfile != NULL) {
+	if (extlogfilename[0] != '\0' && extlogfile != NULL) {
 		fclose(extlogfile);
 	}
 
@@ -1060,12 +1060,12 @@ PVideoFrame __stdcall DePanEstimate_fftw::GetFrame(int ndest, IScriptEnvironment
 	// not write if show correlation surface
 	if (show == 0) write_depan_data(dstp, nfirst,nlast,motionx,motiony,motionzoom);
 
-	if ( (logfilename != "") && logfile != NULL ) {  // write log file if name correct
+	if ( (logfilename[0] != '\0') && logfile != NULL ) {  // write log file if name correct
 		// write frame number, dx, dy, rotation and zoom in Deshaker log format
 		write_deshakerlog(logfile, vi.IsFieldBased(), vi.IsTFF(), ndest, motionx, motiony, motionzoom);
 
 	}
-	if ( (extlogfilename != "") && extlogfile != NULL ) {  // write log file if name correct
+	if ( (extlogfilename[0] != '\0') && extlogfile != NULL ) {  // write log file if name correct
 		// write frame number, dx, dy, rotation and zoom in Deshaker log format
 		write_extlog(extlogfile, vi.IsFieldBased(), vi.IsTFF(), ndest, motionx, motiony, motionzoom, trust);
 	}
