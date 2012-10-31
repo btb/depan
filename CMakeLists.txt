@@ -1,6 +1,12 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(depan)
+project(DePan)
+
+set(DePan_MAJOR_VERSION 1)
+set(DePan_MINOR_VERSION 11)
+set(DePan_PATCH_VERSION 0)
+
+set(DePan_VERSION ${DePan_MAJOR_VERSION}.${DePan_MINOR_VERSION}.${DePan_PATCH_VERSION})
 
 find_package(PkgConfig)
 pkg_check_modules(AVXSYNTH REQUIRED avxsynth)
@@ -23,5 +29,5 @@ add_library(DePan MODULE
     stabilize.cpp
     transform.cpp)
 
-INSTALL(TARGETS DePanEstimate LIBRARY DESTINATION lib/avxsynth)
-INSTALL(TARGETS DePan LIBRARY DESTINATION lib/avxsynth)
+install(TARGETS DePanEstimate LIBRARY DESTINATION lib/avxsynth)
+install(TARGETS DePan LIBRARY DESTINATION lib/avxsynth)
