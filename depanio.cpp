@@ -220,6 +220,33 @@ int read_deshakerlog(const char *inputlog, int num_frames, float motionx[], floa
 
 //
 //*************************************************************************
+// write motion data and trust (line) for current frame to extended log file
+// file must be open
+//
+void write_extlog(FILE *extlogfile, int IsFieldBased, int IsTFF, int ndest, float motionx[], float motiony[], float motionzoom[], float trust[])
+{
+
+	float rotation = 0.0; // no rotation estimation in current version
+
+
+		// write frame number, dx, dy, rotation and zoom in Deshaker log format
+		if (IsFieldBased) { // fields from interlaced clip, A or B ( A is time first in Deshaker log )
+			if ( (ndest%2 == 0 )) { // even TFF or BFF fields - bug fixed in v.1.4.1
+				fprintf(extlogfile," %5dA %7.2f %7.2f %7.3f %7.5f %7.3f\n",ndest/2,motionx[ndest],motiony[ndest], rotation, motionzoom[ndest], trust[ndest]);
+			}
+			else { // odd TFF or BFF fields
+				fprintf(extlogfile," %5dB %7.2f %7.2f %7.3f %7.5f %7.3f\n",ndest/2,motionx[ndest],motiony[ndest], rotation, motionzoom[ndest], trust[ndest]);
+			}
+		}
+		else { // progressive
+			fprintf(extlogfile," %6d %7.2f %7.2f %7.3f %7.5f %7.3f\n",ndest,motionx[ndest],motiony[ndest], rotation, motionzoom[ndest], trust[ndest]);
+		}
+
+
+
+}
+
+//*************************************************************************
 // write motion data (line) for current frame to log file in Deshaker format
 // file must be open
 //
@@ -245,5 +272,4 @@ void write_deshakerlog(FILE *logfile, int IsFieldBased, int IsTFF, int ndest, fl
 
 	
 }
-
 
