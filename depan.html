@@ -2,11 +2,11 @@
 <html>
 <head>
 <meta content="text/html;charset=ISO-8859-1" http-equiv="Content-Type">
-<title>DePan & DePanEstimate Plugins for Avisynth. Global motion tools</title>
+<title>DePan, DePanEstimate plugins for Avisynth. Global motion tools</title>
 <link rel="stylesheet" type="text/css" href="../avisynth.css">
 </head>
 <body>
-<h1>DePan & DePanEstimate</h1>
+<h1>DePan, DePanEstimate</h1>
 <h3>Tools for estimation and compensation of global motion (pan)
 </h3>
 
@@ -240,7 +240,7 @@ Inertial filtering method is used (probably similar to Digistudio VirtualDub plu
 <h4>Function call:<br>
 </h4>
 <p><code>DePanStabilize</code> (<var>clip,
-clip data, float cutoff, float damping, bool addzoom, int prev, int
+clip data, float cutoff, float damping, float initzoom, bool addzoom, int prev, int
 next, int mirror, int blur, int dxmax, int dymax, float zoommax, float
 rotmax, int subpixel, float pixaspect, &nbsp;int fitlast, float
 tzoom, bool info, string inputlog, int method</var>)
@@ -325,7 +325,7 @@ inputlog</var> - name of input log file in Deshaker format (none default,  not r
 <var>
 method</var> - used method for stabilization:<br>
 &nbsp;&nbsp;&nbsp; 0 - inertial (default);<br>
-&nbsp;&nbsp;&nbsp; 1 - average (new since v1.10)
+&nbsp;&nbsp;&nbsp; 1 - average (new since v1.10). <var>dxmax, dymax, rotmax, zoommax, fitlast</var> parameters are ignored.
 </p>
 <h3>DePanScenes function</h3>
 <p>Generate clip with pixel values =255 for defined plane at scenechange and pixel values =0 at rest frames,<br>
@@ -357,7 +357,8 @@ interlaced sources, you must use AviSynth following function
 calculates motion from one field to neighbor (by time) field (from same
 or neighbor frame). For preserving fields order (dominance) and best
 denoising, set parameter <var>MatchFields</var>=true.<br>
-&nbsp;&nbsp;&nbsp; 5. <var>Mirror</var> mode is unique but slightly strange :-). The <var>blur</var> is some workaround to hide sharp mirrored details.<br>
+&nbsp;&nbsp;&nbsp; 5. <var>Mirror</var> mode is unique but slightly strange :-). 
+The <var>blur</var> is some workaround to hide sharp mirrored details. Note: blur is not implemented for rotation as yet.<br>
 &nbsp;&nbsp;&nbsp; 6. Not very fast, not assembler optimized.<br>
 &nbsp;&nbsp;&nbsp; 7. Tested with Avisynth 2.5.3, 2.5.4, 2.5.5, 2.5.6, 2.5.7.<br>
 &nbsp;&nbsp;&nbsp; 8. Old versions DePanEstimate used free FFT2D code by Takuya Ooura 
@@ -563,13 +564,13 @@ and no scaling.
 If a frame exists more than once in the log file, the last line is used.</p>
 <p>Note: For interlaced source, info is for every field (A - first, B - second by time)</p>
 
-<h3>DePan & DepanEstimate client-server framebuffer format (mostly for programmers)</h3>
-<p>Depan & DepanEstimate use framebuffer of special clip for storing of motion data. 
+<h3>DePan and DepanEstimate client-server framebuffer format (mostly for programmers)</h3>
+<p>Depan and DepanEstimate use framebuffer of special clip for storing of motion data. 
 When client (Depan) requests the motion data for frame <code>n</code> from this clip,
 server (DepanEstimate) creates frame and writes such data (from start of framebuffer):
 one header record, and several frame motion data records, from <code>n-range</code> to <code>n+range</code> (<code>nframes = 2*range+1</code> for non-edge frames).
 Definition of motion data parameters is same as in Deshaker log.</p>
-<p>In all versions from 0.6, I use this structures:</p>
+<p>In all versions since 0.6, I use these structures:</p>
 <pre>#define DEPANSIGNATURE "depan06"
 
 typedef struct depanheaderstruct { // structure of header depandata in framebuffer
@@ -711,7 +712,7 @@ Version 1.9.0, November 13, 2006 - Isolated DePanEstimate function to separate p
 removed non-fftw code (now always fftw=true).
   </li>
   <li>
-Version 1.9.1, November 27, 2006 - DePanEstimate: more correct processing of dxmax=0 or dymax=0 
+Version 1.9.1, November 27, 2006 - DePanEstimate: more correct processing of <var>dxmax=0</var> or <var>dymax=0</var> 
   </li>
   <li>
 DePanEstimate Version 1.9.2, March 25, 2007 - DePanEstimate: parameter <var>extlog</var>
@@ -721,17 +722,22 @@ DePanEstimate Version 1.9.2, March 25, 2007 - DePanEstimate: parameter <var>extl
 DePan Version 1.10 beta, May 8, 2007 - DepanStabilize:  added new average <var>method</var>,<br>
 small bug fixed in edge interpolation.
  </li>
+  <li>
+DePan Version 1.10.1, January 27, 2008 - fixed bug with <var>blur</var> mode for <var>subpixel=1</var>.
+ </li>
+  <li>
+August 5, 2011 - released Depan source code under GPL v.2.
+ </li>
 </ul>
 <h3>License</h3>
-<p>The DePanEstimate plugin is free software distributed under GNU GPL license. See gpl.txt for details.<br>
-The DePan plugin is freeware, WITHOUT ANY WARRANTY. You may not distribute it without this documentation.<br>
+<p>Depan and DePanEstimate are free software distributed under GNU GPL license. See gpl.txt for details.<br>
 Documentation is distributed under <a href="http://creativecommons.org/licenses/by-sa/3.0/">CreativeCommons BY-SA 3.0 license.</a><br>
 </p>
-<p>Please consider to make some donation to be registered user.</p>
+<p>Please consider to make some <a href="http://avisynth.org.ru/donate.html">donation</a> for support.</p>
 
 <h3>Download</h3>
 
-<p><a href="depan1100.zip">Download DePan Tools version 1.10.0</a></p>
+<p><a href="depan1101src.zip">Download DePan tools version 1.10.1</a></p>
 <p><a href="depanestimate192.zip">Download DePanEstimate version 1.9.2</a></p>
 
 <p>

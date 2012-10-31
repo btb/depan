@@ -2,7 +2,7 @@
 <html lang="ru"><head>
 <meta http-equiv="Content-Language" content="ru">
 <meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
-<title>DePan & DePanEstimate Plugins for Avisynth. Global motion tools.</title>
+<title>DePan и DePanEstimate плагины для Avisynth. Работа с глобальным движением.</title>
 <link rel="stylesheet" type="text/css" href="../avisynth.css">
 </head>
 <body>
@@ -414,7 +414,7 @@ prev</var>
 <h4>Вызов:</h4>
 
 <p><code>DePanStabilize</code> (<var>clip,
-clip data, float cutoff, float damping, bool addzoom, int prev, int
+clip data, float cutoff, float damping, float initzoom, bool addzoom, int prev, int
 next, int mirror, int blur, int dxmax, int dymax, float zoommax, float
 rotmax, int subpixel, float pixaspect,  int fitlast, float
 tzoom, bool info, string inputlog, int method</var>)
@@ -544,7 +544,7 @@ prev</var>
 <var>
 method</var> - используемый метод стабилизации:<br>
 &nbsp;&nbsp;&nbsp; 0 - инерциальный (по умолчаниб);<br>
-&nbsp;&nbsp;&nbsp; 1 - усреднения (новый с версии 1.10)
+&nbsp;&nbsp;&nbsp; 1 - усреднения (новый с версии 1.10). Параметры <var>dxmax, dymax, rotmax, zoommax, fitlast</var> игнорируются.
 </p>
 <h3> &nbsp;&nbsp;&nbsp;
 Функция DePanScenes</h3>
@@ -603,7 +603,7 @@ Avisynth-команду <code>SeparateFields </code>и
 
 <p>5. Режим <var>mirror</var>(зеркало) является
 уникальным, но немного странным :-). Используйте blur чтобы
-скрыть резкие отраженные детали.</p>
+скрыть резкие отраженные детали. Замечание: blur пока не реализован для вращения.</p>
 
 <p>6. Не очень быстрый, без оптимизации ассемблером моих функций.</p>
 
@@ -1147,20 +1147,25 @@ DePanEstimate Version 1.9.2, 25 марта 2007 - DePanEstimate: параметр <var>extlog
 DePan Version 1.10 beta, 8 мая 2007 - DepanStabilize:  добавлен новый <var>method</var> усреднения,<br>
 исправлена небольшая ошибка в интерполяции краев.
  </li>
+  <li>
+DePan Version 1.10.1, 27 января 2008 - исправлена ошибка с <var>blur</var> для <var>subpixel=1</var>.
+ </li>
+  <li>
+5 августа 2011 - вылодены исходники Depan по лицензии GPL v2.
+ </li>
 </ul>
 
 <h3>
 &nbsp;&nbsp;&nbsp;
 Лицензия</h3>
 
-<p>Плагин DePanEstimate - это программа, распространяемая на условиях лицензии GNU GPL. Смотри gpl-rus.txt.<br>
-Плагин DePan распространяется свободно, но без всяких гарантий. Вы не можете распространять его без данной документации<br>
-Документация распространяется на условиях лицензии <a href="http://creativecommons.org/licenses/by-sa/3.0/">CreativeCommons BY-SA 3.0 license.</a><br>
-<p>Прошу рассмотреть возможность финансовой поддержки, чтобы быть зарегистрированным пользователем.</p>
+<p>Плагины Depan и DePanEstimate - это программы, распространяемая на условиях лицензии GNU GPL. Смотри gpl-rus.txt.<br>
+Покументация распространяется на условиях лицензии <a href="http://creativecommons.org/licenses/by-sa/3.0/">CreativeCommons BY-SA 3.0 license.</a><br>
+<p>Прошу рассмотреть возможность финансовой <a href="http://avisynth.org.ru/donate-rus.html">поддержки</a>.</p>
 
 <h3>Скачивание</h3>
 
-<p><a href="depan1100.zip">Download DePan Tools version 1.10.0</a></p>
+<p><a href="depan1101src.zip">Download DePan tools version 1.10.1</a></p>
 <p><a href="depanestimate192.zip">Download DePanEstimate version 1.9.2</a></p>
 
 <p>

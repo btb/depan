@@ -1,5 +1,5 @@
 /*
-    DePan & DePanEstimate plugin for Avisynth 2.5 - global motion
+    DePan & DePanEstimate plugin for Avisynth 2.5 - global motion 
 	Version 1.9.2, March 25, 2007.
 	(DePan IO header file)
 	Copyright(c) 2004-2007, A.G. Balakhnin aka Fizick

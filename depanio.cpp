@@ -1,5 +1,5 @@
-/*
-    DePan & DepanEstimate plugin for Avisynth 2.5 - global motion
+/* 
+    DePan & DepanEstimate plugin for Avisynth 2.5 - global motion 
 	Version 1.9 November 5, 2006.
 	(input-output internal functions)
 	Copyright(c) 2004-2006, A.G. Balakhnin aka Fizick
@@ -63,7 +63,7 @@ void write_depan_data(BYTE *dstp, int framefirst,int framelast, float motionx[],
 	depanheader header;
 	depandata framedata;
 	int frame;
-
+	
 	for (int i=0; i< sizeof(signaturegood); i++){
 		header.signature[i] = signaturegood[i];
 	}
@@ -72,18 +72,18 @@ void write_depan_data(BYTE *dstp, int framefirst,int framelast, float motionx[],
 
 	int sizeheader = sizeof(header);
 	int sizedata = sizeof(framedata);
-
+	
 	// write date to first line of frame
 	memcpy(dstp, &header,sizeheader);
 	dstp += sizeheader;
 
-	for (frame=framefirst; frame < framelast+1; frame++) {
+	for (frame=framefirst; frame < framelast+1; frame++) {  
 		framedata.frame = frame; // some frame number
 		framedata.dx = motionx[frame]; // motion x for frame
 		framedata.dy = motiony[frame]; // motion y for frame
-		framedata.zoom = motionzoom[frame]; // zoom for frame
+		framedata.zoom = motionzoom[frame]; // zoom for frame 
 		framedata.rot = 0; // rotation for frame - not estimated in current version
-		memcpy(dstp,&framedata,sizedata);
+		memcpy(dstp,&framedata,sizedata); 
 		dstp += sizedata;
 	}
 
@@ -110,25 +110,25 @@ int read_depan_data(const BYTE *data, float motionx[], float motiony[], float mo
 	memcpy(&header,data,sizeof(header)); // read magic word
 
 	// compare readed magic word with good
-	for (w=0; w < sizeof(signaturegood); w++ ) {
+	for (w=0; w < sizeof(signaturegood); w++ ) {  
 		// every byte must be equal
-		if (header.signature[w] != signaturegood[w]) {
+		if (header.signature[w] != signaturegood[w]) { 
 			// bad compare, the frame is not from DePan data clip, return BAD
-			return error;
+			return error;  
 		}
-
+		
 	}
 		data += sizeof(header);
 
 	// read motion data for frames from framebuffer
 	for (i=0; i < header.nframes; i++) {  // number of frames, for which motion data are writed
 		memcpy(&framedata,data,sizeof(framedata)); // get frame number in motion table
-
+		
 		if (framedata.frame == neededframe) error = 0; // GOOD, needed frame is found!
-
+		
 		motionx[framedata.frame] = framedata.dx; // motion x for frame
 		motiony[framedata.frame] = framedata.dy; // motion y for frame
-		motionzoom[framedata.frame] = framedata.zoom; // motion zoom for frame
+		motionzoom[framedata.frame] = framedata.zoom; // motion zoom for frame 
 		motionrot[framedata.frame] = framedata.rot; // motion rotation for frame (degree)
 		data += sizeof(framedata);
 
@@ -144,7 +144,7 @@ int read_depan_data(const BYTE *data, float motionx[], float motiony[], float mo
 //
 int read_deshakerlog(const char *inputlog, int num_frames, float motionx[], float motiony[], float motionrot[], float motionzoom[] , int *loginterlaced)
 {
-
+	
 	FILE *logfile;
 	char line[48];
 	int field;
@@ -154,7 +154,7 @@ int read_deshakerlog(const char *inputlog, int num_frames, float motionx[], floa
 // Open DESHAKER.LOG  file
 		logfile = fopen(inputlog,"rt");
 		if (logfile == NULL) return -1;  // file not found
-
+   
 //   Initialize motion data by nulls
 //    for (i=0; i<2*num_frames+1; ++i) {
     for (n=0; n<num_frames; n++) {
@@ -162,15 +162,15 @@ int read_deshakerlog(const char *inputlog, int num_frames, float motionx[], floa
 		motiony[n] = 0;
 		motionrot[n] = 0;
 		motionzoom[n] = 1;
-    }
-
+    }	
+     
 // Read motion data from DESHAKER.LOG file
-    while (!feof(logfile)){
-		fgets(line,40,logfile);
-		if ( (line[6] == 'A') || (line[6] == 'a') || (line[6] == 'B') || (line[6] == 'b') ) {
+    while (!feof(logfile)){                    
+		fgets(line,40,logfile);                  
+		if ( (line[6] == 'A') || (line[6] == 'a') || (line[6] == 'B') || (line[6] == 'b') ) {  
 			i=0;
 			if (sscanf(line,"%6ld%1x %f %f %f %f",&i,&field,&dx,&dy,&rot,&zoom) >= 5) {      // Interlaced
-				//   decode frame (or field) number
+				//   decode frame (or field) number 
 				switch (field) {
 					case 10:            // 0xa=10, field A of frame (first in time)
 						i = i*2;           // if interlaced, set number to field number (floatd frame number)
@@ -181,11 +181,11 @@ int read_deshakerlog(const char *inputlog, int num_frames, float motionx[], floa
 						*loginterlaced = 1;
 						break;
 					default:
-						fclose(logfile);
-						return -2; //  Error motion log file format
-		        }
+						fclose(logfile);	
+						return -2; //  Error motion log file format 
+		        }   
 				if (i >= num_frames) {
-						fclose(logfile);
+						fclose(logfile);	
 						return -3;  // Too many frames in log file
 				}
 
@@ -195,26 +195,26 @@ int read_deshakerlog(const char *inputlog, int num_frames, float motionx[], floa
 				motionrot[i] = rot;
 				motionzoom[i] = zoom;
 			}
-		}
-        else {             // check as progressive
+		}  
+        else {             // check as progressive 
 			i=0;
 			if (sscanf(line,"%7ld %f %f %f %f",&i,&dx,&dy,&rot,&zoom) >= 5) {
 				if (i >= num_frames) {
-						fclose(logfile);
+						fclose(logfile);	
 						return -3;  // Too many frames in log file
 				}
 
                 *loginterlaced = 0; //  progressive,
-                                   //  i - frame number
+                                   //  i - frame number 
 				motionx[i] = dx;
 				motiony[i] = dy;
 				motionrot[i] = rot;
 				motionzoom[i] = zoom;
            }
-        }
+        }   
     } // end of while
 
-	fclose(logfile);
+	fclose(logfile);	
 	return 0; // OK
 }
 
@@ -252,7 +252,7 @@ void write_extlog(FILE *extlogfile, int IsFieldBased, int IsTFF, int ndest, floa
 //
 void write_deshakerlog(FILE *logfile, int IsFieldBased, int IsTFF, int ndest, float motionx[], float motiony[], float motionzoom[])
 {
-
+	
 	float rotation = 0.0; // no rotation estimation in current version
 
 
@@ -270,6 +270,6 @@ void write_deshakerlog(FILE *logfile, int IsFieldBased, int IsTFF, int ndest, fl
 		}
 
 
-
+	
 }
 
