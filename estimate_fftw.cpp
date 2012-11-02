@@ -128,21 +128,6 @@ DePanEstimate_fftw::DePanEstimate_fftw(PClip _child, int _range, float _trust, i
 	if (dymax >= winy/2) env->ThrowError("DePanEstimate: DYMAX must be less WINY/2 !");
 
 
-	hinstLib = dlopen("libfftw3f.dylib", RTLD_LAZY); // added in v 1.2 for delayed loading
-	if (hinstLib != NULL)
-	{
-		fftwf_free_addr = (fftwf_free_proc) dlsym(hinstLib, "fftwf_free");
-		fftwf_malloc_addr = (fftwf_malloc_proc)dlsym(hinstLib, "fftwf_malloc");
-		fftwf_plan_dft_r2c_2d_addr = (fftwf_plan_dft_r2c_2d_proc) dlsym(hinstLib, "fftwf_plan_dft_r2c_2d");
-		fftwf_plan_dft_c2r_2d_addr = (fftwf_plan_dft_c2r_2d_proc) dlsym(hinstLib, "fftwf_plan_dft_c2r_2d");
-		fftwf_destroy_plan_addr = (fftwf_destroy_plan_proc) dlsym(hinstLib, "fftwf_destroy_plan");
-		fftwf_execute_dft_r2c_addr = (fftwf_execute_dft_r2c_proc) dlsym(hinstLib, "fftwf_execute_dft_r2c");
-		fftwf_execute_dft_c2r_addr = (fftwf_execute_dft_c2r_proc) dlsym(hinstLib, "fftwf_execute_dft_c2r");
-	}
-	if (hinstLib==NULL || fftwf_free_addr==NULL || fftwf_malloc_addr==NULL || fftwf_plan_dft_r2c_2d_addr==NULL ||
-		fftwf_plan_dft_c2r_2d_addr==NULL || fftwf_destroy_plan_addr==NULL || fftwf_execute_dft_r2c_addr==NULL || fftwf_execute_dft_c2r_addr==NULL)
-			env->ThrowError("DePanEstimate: Can not load FFTW3.DLL !");
-
 	// set frames capacity of fft cache
 	fftcachecapacity = range*2 + 4;// modified in version 0.6e to correct for range=0
 
@@ -170,25 +155,25 @@ DePanEstimate_fftw::DePanEstimate_fftw(PClip _child, int _range, float _trust, i
 
 	// memory for cached fft
 	// fftw version
-	fftcache = (fftwf_complex **)fftwf_malloc_addr(fftcachecapacity*sizeof(int)); // array of pointers
+	fftcache = (fftwf_complex **)fftwf_malloc(fftcachecapacity*sizeof(int)); // array of pointers
 	if (fftcache == NULL) env->ThrowError("DepanEstimate: FFTW Allocation Failure!\n");
-	fftcache2 = (fftwf_complex **)fftwf_malloc_addr(fftcachecapacity*sizeof(int));
-	fftcachecomp = (fftwf_complex **)fftwf_malloc_addr(fftcachecapacity*sizeof(int));
-	fftcachecomp2 = (fftwf_complex **)fftwf_malloc_addr(fftcachecapacity*sizeof(int));
+	fftcache2 = (fftwf_complex **)fftwf_malloc(fftcachecapacity*sizeof(int));
+	fftcachecomp = (fftwf_complex **)fftwf_malloc(fftcachecapacity*sizeof(int));
+	fftcachecomp2 = (fftwf_complex **)fftwf_malloc(fftcachecapacity*sizeof(int));
 	for (i=0; i<fftcachecapacity; i++) {
-		fftcache[i] = (fftwf_complex *)fftwf_malloc_addr(sizeof(fftwf_complex) * fftsize );
-		fftcachecomp[i] = (fftwf_complex *)fftwf_malloc_addr(sizeof(fftwf_complex) * fftsize );
+		fftcache[i] = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * fftsize );
+		fftcachecomp[i] = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * fftsize );
 		if (zoommax != 1){
-			fftcache2[i] = (fftwf_complex *)fftwf_malloc_addr(sizeof(fftwf_complex) * fftsize );  // right window if zoom
-			fftcachecomp2[i] = (fftwf_complex *)fftwf_malloc_addr(sizeof(fftwf_complex) * fftsize ); // right window if zoom
+			fftcache2[i] = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * fftsize );  // right window if zoom
+			fftcachecomp2[i] = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * fftsize ); // right window if zoom
 		}
 	}
 
 
 	// memory for correlation matrice
-	correl = (fftwf_complex *)fftwf_malloc_addr(sizeof(fftwf_complex) * fftsize);//alloc_2d_float(winy, winx, env);
+	correl = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * fftsize);//alloc_2d_float(winy, winx, env);
 	if (zoommax != 1){
-		correl2 = (fftwf_complex *)fftwf_malloc_addr(sizeof(fftwf_complex) * fftsize);
+		correl2 = (fftwf_complex *)fftwf_malloc(sizeof(fftwf_complex) * fftsize);
 	}
 
 	realcorrel = (float *) correl; // for inplace transform
@@ -197,8 +182,8 @@ DePanEstimate_fftw::DePanEstimate_fftw(PClip _child, int _range, float _trust, i
 	}
 	// create FFTW plan
 	// change from FFTW_MEASURE to FFTW_ESTIMATE for more short init, without speed change (for  power-2 windows) in v 1.1.1
-	plan = fftwf_plan_dft_r2c_2d_addr(winy, winx, realcorrel, correl, FFTW_ESTIMATE); // direct fft
-	planinv = fftwf_plan_dft_c2r_2d_addr(winy, winx, correl, realcorrel, FFTW_ESTIMATE); // inverse fft
+	plan = fftwf_plan_dft_r2c_2d(winy, winx, realcorrel, correl, FFTW_ESTIMATE); // direct fft
+	planinv = fftwf_plan_dft_c2r_2d(winy, winx, correl, realcorrel, FFTW_ESTIMATE); // inverse fft
 
 	motionx = (float *)malloc(vi.num_frames*sizeof(float));
 	if (motionx == NULL) env->ThrowError("DepanEstimate: Allocation Failure!\n");
@@ -258,32 +243,29 @@ DePanEstimate_fftw::~DePanEstimate_fftw() {
 	free(fftcachelistcomp);
 	free(fftcachelistcomp2);
 
-	fftwf_destroy_plan_addr(plan);
-	fftwf_destroy_plan_addr(planinv);
+	fftwf_destroy_plan(plan);
+	fftwf_destroy_plan(planinv);
 
 	for (int i=0; i<fftcachecapacity; i++) {
-		fftwf_free_addr(fftcache[i]);
-		fftwf_free_addr(fftcachecomp[i]);
+		fftwf_free(fftcache[i]);
+		fftwf_free(fftcachecomp[i]);
 		if (zoommax != 1){
-			fftwf_free_addr(fftcache2[i]);
-			fftwf_free_addr(fftcachecomp2[i]);
+			fftwf_free(fftcache2[i]);
+			fftwf_free(fftcachecomp2[i]);
 		}
 	}
-	fftwf_free_addr(fftcache);
-	fftwf_free_addr(fftcachecomp);
-	fftwf_free_addr(correl);
+	fftwf_free(fftcache);
+	fftwf_free(fftcachecomp);
+	fftwf_free(correl);
 	if (zoommax != 1){
-		fftwf_free_addr(fftcache2);
-		fftwf_free_addr(fftcachecomp2);
-		fftwf_free_addr(correl2);
+		fftwf_free(fftcache2);
+		fftwf_free(fftcachecomp2);
+		fftwf_free(correl2);
 	}
 	free(motionx);
 	free(motiony);
 	free(motionzoom);
 	free(trust);
-
-	if (hinstLib != NULL)
-		dlclose(hinstLib);
 }
 
 
@@ -673,7 +655,7 @@ fftwf_complex *  DePanEstimate_fftw::get_plane_fft(const BYTE * srcp,  int src_h
 		frame_data2d (srcp, src_height, src_width, src_pitch, realdata, winx, winy, winleft, isYUY2);
 		// make forward fft of data
 //		rdft2d(winy, winx, 1, fftsrc, NULL, fftip, fftwork);
-		fftwf_execute_dft_r2c_addr(plan, realdata, fftsrc);
+		fftwf_execute_dft_r2c(plan, realdata, fftsrc);
 		// now data is fft
 		// reserve cache with this number
 		fftcachelist[ncs] = nsrc;
@@ -877,7 +859,7 @@ PVideoFrame __stdcall DePanEstimate_fftw::GetFrame(int ndest, IScriptEnvironment
 					// prepare correlation data = mult fftsrc* by fftprev
 					mult_conj_data2d (fftcur, fftprev, correl, winx, winy);
 					// make inverse fft of prepared correl data
-					fftwf_execute_dft_c2r_addr(planinv, correl, realcorrel); // added in v.1.0
+					fftwf_execute_dft_c2r(planinv, correl, realcorrel); // added in v.1.0
 					// now correl is is true correlation surface
 					// find global motion vector as maximum on correlation sufrace
 					// save vector to motion table
@@ -938,7 +920,7 @@ PVideoFrame __stdcall DePanEstimate_fftw::GetFrame(int ndest, IScriptEnvironment
 					mult_conj_data2d (fftcur, fftprev, correl, winx, winy);
 					// make inverse fft of prepared correl data
 //					rdft2d(winy, winx, -1, correl, NULL, fftip, fftwork);
-					fftwf_execute_dft_c2r_addr(planinv, correl, realcorrel); // added in v.1.0
+					fftwf_execute_dft_c2r(planinv, correl, realcorrel); // added in v.1.0
 					// now correl is is true correlation surface
 					// find global motion vector as maximum on correlation sufrace
 					// save vector to motion table
@@ -951,7 +933,7 @@ PVideoFrame __stdcall DePanEstimate_fftw::GetFrame(int ndest, IScriptEnvironment
 					mult_conj_data2d (fftcur2, fftprev2, correl2, winx, winy);
 					// make inverse fft of prepared correl data
 //					rdft2d(winy, winx, -1, correl2, NULL, fftip, fftwork);
-					fftwf_execute_dft_c2r_addr(planinv, correl2, realcorrel2); // added in v.1.0
+					fftwf_execute_dft_c2r(planinv, correl2, realcorrel2); // added in v.1.0
 					// now correl is is true correlation surface
 					// find global motion vector as maximum on correlation sufrace
 					// save vector to motion table

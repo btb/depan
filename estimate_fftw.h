@@ -52,9 +52,8 @@
 
 #include <windowsPorts/windows2linux.h>
 #include <avxplugin.h>
-#include "stdio.h"
-//#include "fftw\fftw3.h"
-#include "fftwlite.h" // v.1.2
+#include <stdio.h>
+#include <fftw3.h>
 
 using namespace avxsynth;
 
@@ -134,15 +133,6 @@ class DePanEstimate_fftw : public GenericVideoFilter {
 //	int * work2width1030;  // work array for interpolation
 	char debugbuf[96]; // buffer for debugview utility
 
-	// added in v.1.2 for delayed loading
-	HINSTANCE hinstLib;
-	fftwf_malloc_proc fftwf_malloc_addr;
-	fftwf_free_proc fftwf_free_addr;
-	fftwf_plan_dft_r2c_2d_proc fftwf_plan_dft_r2c_2d_addr;
-	fftwf_plan_dft_c2r_2d_proc fftwf_plan_dft_c2r_2d_addr;
-	fftwf_destroy_plan_proc fftwf_destroy_plan_addr;
-	fftwf_execute_dft_r2c_proc fftwf_execute_dft_r2c_addr;
-	fftwf_execute_dft_c2r_proc fftwf_execute_dft_c2r_addr;
 
 
 
